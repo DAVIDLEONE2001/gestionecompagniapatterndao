@@ -5,12 +5,14 @@ import java.time.LocalDate;
 public class Impiegato {
 	
 	//id, nome, cognome, codiceFiscale, dataNascita, dataAssunzione
+	
 	private Long id;
 	private String nome;
 	private String cognome;
 	private String codiceFiscale;
 	private LocalDate dataNascita;
 	private LocalDate dataAssunzione;
+	private Compagnia compagnia;
 	
 	public Impiegato(String nome, String cognome, String codiceFiscale, LocalDate dataNascita,
 			LocalDate dataAssunzione) {
@@ -21,6 +23,30 @@ public class Impiegato {
 		this.dataNascita = dataNascita;
 		this.dataAssunzione = dataAssunzione;
 	}
+	
+	
+
+	public Impiegato(Long id, String nome, String cognome, String codiceFiscale, LocalDate dataNascita,
+			LocalDate dataAssunzione, Compagnia compagnia) {
+		super();
+		this.id = id;
+		this.nome = nome;
+		this.cognome = cognome;
+		this.codiceFiscale = codiceFiscale;
+		this.dataNascita = dataNascita;
+		this.dataAssunzione = dataAssunzione;
+		this.compagnia = compagnia;
+	}
+
+
+	
+	
+
+	public Impiegato() {
+		super();
+	}
+
+
 
 	public String getNome() {
 		return nome;
@@ -68,6 +94,14 @@ public class Impiegato {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Compagnia getCompagnia() {
+		return compagnia;
+	}
+
+	public void setCompagnia(Compagnia compagnia) {
+		this.compagnia = compagnia;
 	}
 	
 	
