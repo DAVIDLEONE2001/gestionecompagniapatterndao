@@ -23,7 +23,7 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 		if (isNotActive())
 			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
 
-		ArrayList<Compagnia> result = new ArrayList<Compagnia>();
+		List<Compagnia> result = new ArrayList<Compagnia>();
 
 		try (Statement ps = connection.createStatement(); ResultSet rs = ps.executeQuery("select * from compagnia")) {
 
@@ -44,7 +44,7 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 		return result;
 	}
 
-	public List<Compagnia> listEager() throws Exception {// LAZY
+	public List<Compagnia> listEager() throws Exception {// EAGER
 
 		if (isNotActive())
 			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
@@ -54,7 +54,7 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 
 		try (Statement ps = connection.createStatement();
 				ResultSet rs = ps
-						.executeQuery("select * from compagnia c inner join impiegato i on c.id=i.id_compagnia")) {
+						.executeQuery("select * from compagnia c left outer join impiegato i on c.id=i.id_compagnia")) {
 
 			while (rs.next()) {
 				Compagnia compagniaTemp = new Compagnia();
@@ -74,7 +74,9 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 						rs.getDate("DATAASSUNZIONE") != null ? rs.getDate("DATAASSUNZIONE").toLocalDate() : null);
 				impiegatoTemp.setId(rs.getLong("ID"));
 				impiegatiTemp.add(impiegatoTemp);
-				compagniaTemp.setImpiegati(impiegatiTemp);
+				if (impiegatoTemp != null) {
+					compagniaTemp.setImpiegati(impiegatiTemp);
+				}
 
 				result.add(compagniaTemp);
 			}
@@ -151,7 +153,7 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 
 		int result = 0;
 		try (PreparedStatement ps = connection.prepareStatement(
-				"INSERT INTO user (ragionesociale, fatturatoannuo, datafondazion) VALUES (?, ?, ?);")) {
+				"INSERT INTO compagnia (ragionesociale, fatturatoannuo, datafondazione) VALUES (?, ?, ?);")) {
 			ps.setString(1, input.getRagioneSociale());
 			ps.setInt(2, input.getFatturatoAnnuo());
 			ps.setDate(3, java.sql.Date.valueOf(input.getDataFondazione()));
@@ -182,6 +184,7 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 	}
 
 	public List<Compagnia> findAllByDataAssunzioneMaggioreDi(LocalDate dateCreatedInput) throws Exception {
+
 		if (isNotActive())
 			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
 
@@ -235,7 +238,7 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 		try (PreparedStatement ps = connection.prepareStatement(
 				"select * from compagnia c inner join impiegato i on c.id=i.id_compagnia where ragionesociale like ? ");) {
 
-			ps.setString(1, "%"+ragioneSocialeInput+"%");
+			ps.setString(1, "%" + ragioneSocialeInput + "%");
 
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
@@ -277,9 +280,9 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 		List<Impiegato> impiegatiTemp = new ArrayList<>();
 
 		try (PreparedStatement ps = connection.prepareStatement(
-				"select * from compagnia c inner join impiegato i on c.id=i.id_compagnia where i.codicefiscale like ? ");) {
+				"select * from compagnia c inner join impiegato i on c.id=i.id_compagnia where codicefiscale like ? ");) {
 
-			ps.setString(1, "%"+parteDiCodiceFiscaleInput+"%");
+			ps.setString(1, "%" + parteDiCodiceFiscaleInput + "%");
 
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
