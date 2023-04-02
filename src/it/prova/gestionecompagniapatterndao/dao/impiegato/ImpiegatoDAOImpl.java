@@ -88,8 +88,27 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 	}
 
 	public int insert(Impiegato input) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		if (isNotActive())
+			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
+
+		if (input == null)
+			throw new Exception("Valore di input non ammesso.");
+
+		int result = 0;
+		try (PreparedStatement ps = connection.prepareStatement(
+				"INSERT INTO impiegato (nome, cognome, codicefiscale, datanascita, dataassunzione, id_compagnia) VALUES (?, ?, ?, ?, ?, ?);")) {
+			ps.setString(1, input.getNome());
+			ps.setString(2, input.getCognome());
+			ps.setString(3, input.getCodiceFiscale());
+			ps.setDate(4, java.sql.Date.valueOf(input.getDataNascita()));
+			ps.setDate(5, java.sql.Date.valueOf(input.getDataAssunzione()));
+			ps.setLong(6, input.getCompagnia().getId());
+			result = ps.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return result;
 	}
 
 	public int delete(Impiegato input) throws Exception {
@@ -98,8 +117,36 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 	}
 
 	public List<Impiegato> findAllByCompagnia(Compagnia compagniaInput) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		if (isNotActive())
+			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
+
+		if (compagniaInput == null || compagniaInput.getId() < 1)
+			throw new Exception("Valore di input non ammesso.");
+		List<Impiegato> result = new ArrayList<>();
+		Impiegato impiegatoTemp = null;
+		try (PreparedStatement ps = connection.prepareStatement("select * from impiegato where id_azienda=?")) {
+
+			ps.setLong(1, compagniaInput.getId());
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					impiegatoTemp = new Impiegato();
+					impiegatoTemp.setNome(rs.getString("NOME"));
+					impiegatoTemp.setCognome(rs.getString("COGNOME"));
+					impiegatoTemp.setCodiceFiscale(rs.getString("CODICEFISCALE"));
+					impiegatoTemp.setDataNascita(
+							rs.getDate("DATANASCITA") != null ? rs.getDate("DATANASCITA").toLocalDate() : null);
+					impiegatoTemp.setDataAssunzione(
+							rs.getDate("DATAASSUNZIONE") != null ? rs.getDate("DATAASSUNZIONE").toLocalDate() : null);
+					impiegatoTemp.setId(rs.getLong("ID"));
+					result.add(impiegatoTemp);
+				}
+			} // niente catch qui
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return result;
 	}
 
 	public int countByDataFondazioneCompagniaGreaterThan(LocalDate dateCreatedInput) throws Exception {
@@ -108,8 +155,40 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 	}
 
 	public List<Impiegato> findAllByCompagniaConFatturatoMaggioreDi(int fatturatoInput) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+
+		if (isNotActive())
+			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
+
+//		List<Compagnia> result = new ArrayList<Compagnia>();
+		List<Impiegato> result = new ArrayList<>();
+
+		try (PreparedStatement ps = connection.prepareStatement(
+				"select * from compagnia c left outer join impiegato i on c.id=i.id_compagnia where c.fatturato>?")) {
+
+			ps.setInt(1, fatturatoInput);
+
+			try (ResultSet rs = ps.executeQuery()) {
+
+				while (rs.next()) {
+
+					Impiegato impiegatoTemp = new Impiegato();
+					impiegatoTemp.setNome(rs.getString("NOME"));
+					impiegatoTemp.setCognome(rs.getString("COGNOME"));
+					impiegatoTemp.setCodiceFiscale(rs.getString("CODICEFISCALE"));
+					impiegatoTemp.setDataNascita(
+							rs.getDate("DATANASCITA") != null ? rs.getDate("DATANASCITA").toLocalDate() : null);
+					impiegatoTemp.setDataAssunzione(
+							rs.getDate("DATAASSUNZIONE") != null ? rs.getDate("DATAASSUNZIONE").toLocalDate() : null);
+					impiegatoTemp.setId(rs.getLong("ID"));
+					result.add(impiegatoTemp);
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw e;
+			}
+			return result;
+		}
 	}
 
 	public List<Impiegato> findAllErroriAssunzione() throws Exception {
