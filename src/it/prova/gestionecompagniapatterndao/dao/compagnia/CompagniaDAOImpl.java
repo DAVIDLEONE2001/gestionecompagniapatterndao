@@ -173,7 +173,7 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 			throw new Exception("Valore di input non ammesso.");
 
 		int result = 0;
-		try (PreparedStatement ps = connection.prepareStatement("DELETE FROM comapgnia WHERE ID=?")) {
+		try (PreparedStatement ps = connection.prepareStatement("DELETE FROM compagnia WHERE ID=?")) {
 			ps.setLong(1, input.getId());
 			result = ps.executeUpdate();
 		} catch (Exception e) {
@@ -236,7 +236,7 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 		List<Impiegato> impiegatiTemp = new ArrayList<>();
 
 		try (PreparedStatement ps = connection.prepareStatement(
-				"select * from compagnia c inner join impiegato i on c.id=i.id_compagnia where ragionesociale like ? ");) {
+				"select * from compagnia c left outer join impiegato i on c.id=i.id_compagnia where ragionesociale like ? ");) {
 
 			ps.setString(1, "%" + ragioneSocialeInput + "%");
 
@@ -272,7 +272,7 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 		return result;
 	}
 
-	public List<Compagnia> findAllBYCodFisImpiegatoContiene(String parteDiCodiceFiscaleInput) throws Exception {
+	public List<Compagnia> findAllByCodFisImpiegatoContiene(String parteDiCodiceFiscaleInput) throws Exception {
 		if (isNotActive())
 			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
 
@@ -317,3 +317,4 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 	}
 
 }
+//tutti testati

@@ -42,6 +42,19 @@ public class Impiegato {
 	
 	
 
+	public Impiegato(Long id, String nome, String cognome, String codiceFiscale, LocalDate dataNascita,
+			LocalDate dataAssunzione) {
+		super();
+		this.id = id;
+		this.nome = nome;
+		this.cognome = cognome;
+		this.codiceFiscale = codiceFiscale;
+		this.dataNascita = dataNascita;
+		this.dataAssunzione = dataAssunzione;
+	}
+
+
+
 	public Impiegato(String nome, String cognome, String codiceFiscale, LocalDate dataNascita, LocalDate dataAssunzione,
 			Compagnia compagnia) {
 		super();

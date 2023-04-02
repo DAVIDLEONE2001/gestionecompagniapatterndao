@@ -21,5 +21,6 @@ public interface ImpiegatoDAO extends IBaseDAO<Impiegato> {
 	public int countByDataFondazioneCompagniaGreaterThan(LocalDate dateCreatedInput) throws Exception;
 	public List<Impiegato> findAllByCompagniaConFatturatoMaggioreDi(int fatturatoInput) throws Exception;
 	public List<Impiegato> findAllErroriAssunzione() throws Exception;
+	public Impiegato getEager(Long idInput) throws Exception;
 	
 }
